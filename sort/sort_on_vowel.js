@@ -16,6 +16,6 @@ function sortOnVowelCount(array) {
   return array.sort(vowelCount);
 }
 
-const words = ["apple", "banana", "kiwi", "grape"];
+const words = ["apple", "a", "aaaaa", "banana", "kiwi", "grape"];
 
 console.log(sortOnVowelCount(words));
