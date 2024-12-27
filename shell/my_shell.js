@@ -1,10 +1,25 @@
-import { fileSystem, curerntDirectory, currentPath } from "./file_system.js";
+import { fileSystem } from "./file_system.js";
+
+let curerntDirectory = "~";
+let currentPath = [];
+
+const executeCommand = (fn, args) => {
+  if (fn === undefined) {
+    return inValidCommand();
+  }
+
+  return fn(args);
+};
+
+const deepObject = (object, key) => {
+  return object[key];
+};
 
 const runCDCommand = (args) => {
   const pathToGo = args[0].split("/");
-  const innerFiles = currentPath.reduce(getNestedKey, fileSystem);
+  const innerFiles = currentPath.reduce(deepObject, fileSystem);
 
-  if (!pathToGo.reduce((object, key) => object[key], innerFiles)) {
+  if (!pathToGo.reduce(deepObject, innerFiles)) {
     console.log("invalid Path");
     return;
   }
@@ -29,6 +44,10 @@ const runTOUCHCommand = (args) => {
   console.log("TOUCH", args);
 };
 
+const inValidCommand = () => {
+  console.log("command not found!");
+};
+
 const executeExternalCommand = (commandName, args) => {
   const externalCommands = {
     mkdir: runMKDIRCommand,
@@ -36,12 +55,7 @@ const executeExternalCommand = (commandName, args) => {
     touch: runTOUCHCommand,
   };
 
-  if (!(commandName in externalCommands)) {
-    console.log(commandName, "- command not found!");
-    return;
-  }
-
-  externalCommands[commandName](args);
+  executeCommand(externalCommands[commandName], args);
 };
 
 const executeInputCommand = (command, args) => {
