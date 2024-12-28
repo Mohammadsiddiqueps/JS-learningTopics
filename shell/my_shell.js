@@ -3,25 +3,36 @@ import { fileSystem } from "./file_system.js";
 let curerntDirectory = "~";
 let currentPath = [];
 
-const executeCommand = (fn, args) => {
+const executeCommand = (fn, ...args) => {
   if (fn === undefined) {
     return inValidCommand();
   }
 
-  return fn(args);
+  return fn(...args);
 };
 
 const deepObject = (object, key) => {
   return object[key];
 };
 
-const runCDCommand = (args) => {
-  const pathToGo = args[0].split("/");
-  const innerFiles = currentPath.reduce(deepObject, fileSystem);
+const spreadInputPath = (path) => {
+  return path.split("/");
+};
 
-  if (!pathToGo.reduce(deepObject, innerFiles)) {
-    console.log("invalid Path");
-    return;
+const getDeeperFiles = (path, outerFiles) => {
+  return path.reduce(deepObject, outerFiles);
+};
+
+const showErrorMessage = (errorMsg) => {
+  console.log(errorMsg);
+};
+
+const runCDCommand = (args) => {
+  const pathToGo = spreadInputPath(args[0]);
+  const innerFiles = getDeeperFiles(currentPath, fileSystem);
+
+  if (!getDeeperFiles(pathToGo, innerFiles)) {
+    return showErrorMessage("invalid Path");
   }
 
   currentPath = [...currentPath, ...pathToGo];
@@ -62,7 +73,7 @@ const executeInputCommand = (command, args) => {
   const internalCommands = { cd: runCDCommand, ls: runLSCommand };
 
   if (command in internalCommands) {
-    return internalCommands[command](args);
+    return executeCommand(internalCommands[command], args);
   }
 
   return executeExternalCommand(command, args);
